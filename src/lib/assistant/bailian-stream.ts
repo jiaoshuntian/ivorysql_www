@@ -8,7 +8,24 @@ type TranslateOptions = {
 const encoder = new TextEncoder();
 
 export function encodeAssistantEvent(event: AssistantStreamEvent): Uint8Array {
-  return encoder.encode(`data: ${JSON.stringify(event)}\n\n`);
+  let data: object;
+  switch (event.type) {
+    case "token":
+      data = { content: event.content };
+      break;
+    case "sources":
+      data = { items: event.items };
+      break;
+    case "error":
+      data = { code: event.code, message: event.message };
+      break;
+    case "done":
+      data = {};
+  }
+
+  return encoder.encode(
+    `event: ${event.type}\ndata: ${JSON.stringify(data)}\n\n`,
+  );
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -247,10 +247,10 @@ describe("createAssistantHandler", () => {
 
     const output = await (await handler(request())).text();
 
-    expect(output).toContain('{"type":"token","content":"partial"}');
+    expect(output).toContain('event: token\ndata: {"content":"partial"}');
     expect(output).toContain(
-      '{"type":"error","code":"TIMEOUT","message":"Response timed out."}',
+      'event: error\ndata: {"code":"TIMEOUT","message":"Response timed out."}',
     );
-    expect(output).not.toContain('{"type":"done"}');
+    expect(output).not.toContain("event: done");
   });
 });

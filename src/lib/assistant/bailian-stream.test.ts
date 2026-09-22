@@ -41,7 +41,13 @@ async function readEvents(
   return text
     .split("\n\n")
     .filter(Boolean)
-    .map((part) => JSON.parse(part.replace(/^data: /, "")));
+    .map((part) => {
+      const [eventLine, dataLine] = part.split("\n");
+      return {
+        type: eventLine.replace("event: ", ""),
+        ...JSON.parse(dataLine.replace("data: ", "")),
+      };
+    });
 }
 
 describe("translateBailianStream", () => {
@@ -203,6 +209,6 @@ describe("encodeAssistantEvent", () => {
   it("encodes a website SSE event", () => {
     expect(
       new TextDecoder().decode(encodeAssistantEvent({ type: "done" })),
-    ).toBe('data: {"type":"done"}\n\n');
+    ).toBe("event: done\ndata: {}\n\n");
   });
 });
