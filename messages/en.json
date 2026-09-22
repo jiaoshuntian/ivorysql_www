@@ -1,4 +1,30 @@
 {
+  "Assistant": {
+    "launcherLabel": "Ask IvorySQL AI",
+    "title": "IvorySQL documentation assistant",
+    "description": "Answers are based on the latest official documentation.",
+    "disclaimer": "AI can make mistakes. Verify production changes against the cited documentation.",
+    "placeholder": "Ask about IvorySQL...",
+    "send": "Send",
+    "stop": "Stop generating",
+    "close": "Close assistant",
+    "clear": "Clear conversation",
+    "copyCode": "Copy code",
+    "copied": "Copied",
+    "sources": "Official sources",
+    "unverified": "No verifiable official source was returned.",
+    "incomplete": "This answer was interrupted and may be incomplete.",
+    "retry": "Try again",
+    "rateLimited": "Too many questions. Please wait a minute and try again.",
+    "timeout": "The answer took too long. Please try again.",
+    "unavailable": "The assistant is temporarily unavailable.",
+    "invalidRequest": "Please shorten your question or clear older messages.",
+    "suggestions": {
+      "install": "How do I install IvorySQL?",
+      "oracle": "Which Oracle compatibility features are supported?",
+      "upgrade": "How do I upgrade to the latest IvorySQL version?"
+    }
+  },
   "Navbar": {
     "openMenu": "Open main menu",
     "docs": "Docs",

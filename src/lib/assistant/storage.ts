@@ -62,7 +62,11 @@ function parseMessage(value: unknown): StoredChatMessage | undefined {
     role: value.role,
     content: value.content,
   };
-  if (value.status) message.status = value.status;
+  if (value.status) {
+    message.status = value.status;
+  } else if (value.role === "assistant") {
+    message.status = "incomplete";
+  }
   if (Array.isArray(value.sources)) {
     const sources = value.sources.map(parseSource);
     if (sources.some((source) => source === undefined)) return undefined;

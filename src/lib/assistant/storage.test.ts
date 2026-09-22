@@ -79,6 +79,25 @@ describe("assistant conversation storage", () => {
     ]);
   });
 
+  it("restores an in-progress assistant message as interrupted", () => {
+    expect(
+      parseStoredConversation(
+        JSON.stringify([
+          { id: "user-1", role: "user", content: "Question" },
+          { id: "answer-1", role: "assistant", content: "Partial" },
+        ]),
+      ),
+    ).toEqual([
+      { id: "user-1", role: "user", content: "Question" },
+      {
+        id: "answer-1",
+        role: "assistant",
+        content: "Partial",
+        status: "incomplete",
+      },
+    ]);
+  });
+
   it("serializes a bounded conversation", () => {
     const messages = Array.from({ length: 21 }, (_, index) => ({
       id: String(index),

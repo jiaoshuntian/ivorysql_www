@@ -1,4 +1,30 @@
 {
+  "Assistant": {
+    "launcherLabel": "咨询 IvorySQL AI",
+    "title": "IvorySQL 文档助手",
+    "description": "回答内容基于最新版官方文档。",
+    "disclaimer": "AI 可能会出错，生产环境变更前请核对引用的官方文档。",
+    "placeholder": "请输入关于 IvorySQL 的问题……",
+    "send": "发送",
+    "stop": "停止生成",
+    "close": "关闭助手",
+    "clear": "清空对话",
+    "copyCode": "复制代码",
+    "copied": "已复制",
+    "sources": "官方来源",
+    "unverified": "本次回答未返回可验证的官方来源。",
+    "incomplete": "回答已中断，内容可能不完整。",
+    "retry": "重试",
+    "rateLimited": "提问过于频繁，请等待一分钟后重试。",
+    "timeout": "回答超时，请重试。",
+    "unavailable": "助手暂时不可用。",
+    "invalidRequest": "请缩短问题，或清空较早的对话后重试。",
+    "suggestions": {
+      "install": "如何安装 IvorySQL？",
+      "oracle": "IvorySQL 支持哪些 Oracle 兼容特性？",
+      "upgrade": "如何升级到最新版 IvorySQL？"
+    }
+  },
   "Navbar": {
     "openMenu": "打开主菜单",
     "docs": "文档",

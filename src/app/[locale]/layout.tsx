@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
+import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import { Footer } from "@/components/blocks/footer";
 import { Navbar } from "@/components/blocks/navbar";
 import { StyleGlideProvider } from "@/components/styleglide-provider";
@@ -156,6 +157,7 @@ export default async function RootLayout({
             <Navbar />
             <main className="">{children}</main>
             <Footer />
+            <AssistantWidget locale={locale} />
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
