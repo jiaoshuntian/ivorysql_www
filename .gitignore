@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local git worktrees
 /.worktrees/
+
+# Local Netlify folder
+.netlify
