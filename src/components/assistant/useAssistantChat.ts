@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { readAssistantStream } from "@/lib/assistant/client-stream";
+import { createMessageId } from "@/lib/assistant/message-id";
 import {
   getAssistantStorageKey,
   parseStoredConversation,
@@ -71,7 +72,7 @@ export function useAssistantChat(
 
   const startRequest = useCallback(
     async (conversation: StoredChatMessage[]) => {
-      const answerId = crypto.randomUUID();
+      const answerId = createMessageId();
       const answer: StoredChatMessage = {
         id: answerId,
         role: "assistant",
@@ -152,7 +153,7 @@ export function useAssistantChat(
       const content = rawQuestion.trim();
       if (!content || abortRef.current) return;
       const userMessage: StoredChatMessage = {
-        id: crypto.randomUUID(),
+        id: createMessageId(),
         role: "user",
         content,
       };
