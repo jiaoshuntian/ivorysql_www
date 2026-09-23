@@ -108,6 +108,20 @@ describe("readAssistantStream", () => {
     });
   });
 
+  it("maps a platform-level 429 without relying on a JSON body", async () => {
+    const callbacks = handlers();
+
+    await readAssistantStream(
+      new Response("rate limit exceeded", { status: 429 }),
+      callbacks,
+    );
+
+    expect(callbacks.onError).toHaveBeenCalledWith({
+      code: "RATE_LIMITED",
+      message: "Too many assistant requests.",
+    });
+  });
+
   it("stops quietly when the caller aborts", async () => {
     const abortController = new AbortController();
     const callbacks = handlers();

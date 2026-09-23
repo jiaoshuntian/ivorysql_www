@@ -3,6 +3,7 @@ import type { AssistantSource, AssistantStreamEvent } from "./types";
 type TranslateOptions = {
   signal?: AbortSignal;
   onEvent?: (event: AssistantStreamEvent) => void;
+  onCancel?: () => void;
 };
 
 const encoder = new TextEncoder();
@@ -88,6 +89,7 @@ export function translateBailianStream(
   options: TranslateOptions = {},
 ): ReadableStream<Uint8Array> {
   const reader = input.getReader();
+  let cancelled = false;
 
   return new ReadableStream<Uint8Array>({
     async start(controller) {
@@ -98,6 +100,7 @@ export function translateBailianStream(
       let parsingFailed = false;
 
       const emit = (event: AssistantStreamEvent) => {
+        if (cancelled) return;
         controller.enqueue(encodeAssistantEvent(event));
         try {
           options.onEvent?.(event);
@@ -180,6 +183,8 @@ export function translateBailianStream(
           processBufferedFrames();
         }
 
+        if (cancelled) return;
+
         buffer += decoder.decode();
         processBufferedFrames();
         if (buffer.trim()) processFrame(buffer);
@@ -197,6 +202,7 @@ export function translateBailianStream(
           emit({ type: "done" });
         }
       } catch {
+        if (cancelled) return;
         emit(
           isTimeout(options.signal)
             ? {
@@ -211,12 +217,18 @@ export function translateBailianStream(
               },
         );
       } finally {
-        controller.close();
+        if (!cancelled) controller.close();
         reader.releaseLock();
       }
     },
     async cancel(reason) {
-      await reader.cancel(reason);
+      cancelled = true;
+      try {
+        options.onCancel?.();
+      } catch {
+        // Observability must never interrupt upstream cancellation.
+      }
+      await reader.cancel(reason).catch(() => undefined);
     },
   });
 }

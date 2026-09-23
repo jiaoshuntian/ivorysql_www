@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { encodeAssistantEvent, translateBailianStream } from "./bailian-stream";
 import type { AssistantStreamEvent } from "./types";
@@ -102,6 +102,32 @@ describe("translateBailianStream", () => {
       { type: "token", content: "partial" },
       { type: "error", code: "TIMEOUT", message: "Response timed out." },
     ]);
+  });
+
+  it("cancels upstream without emitting a synthetic terminal event", async () => {
+    const upstreamCancelled = vi.fn();
+    const onEvent = vi.fn();
+    const onCancel = vi.fn();
+    let sent = false;
+    const input = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (sent) return;
+        sent = true;
+        controller.enqueue(encoder.encode(generationFrame("partial")));
+      },
+      cancel: upstreamCancelled,
+    });
+    const output = translateBailianStream(input, { onEvent, onCancel });
+    const reader = output.getReader();
+
+    expect(new TextDecoder().decode((await reader.read()).value)).toContain(
+      'event: token\ndata: {"content":"partial"}',
+    );
+    await reader.cancel("visitor stopped");
+
+    expect(upstreamCancelled).toHaveBeenCalledWith("visitor stopped");
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(onEvent.mock.calls.map(([event]) => event.type)).toEqual(["token"]);
   });
 
   it.each(["object", "string"])(

@@ -16,13 +16,17 @@ type AssistantEnvironment = Record<AssistantEnvKey, string>;
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 const encoder = new TextEncoder();
+const SECURITY_HEADERS = {
+  "Referrer-Policy": "no-referrer",
+  "X-Content-Type-Options": "nosniff",
+} as const;
 
 function jsonError(status: number, code: string, message: string): Response {
   return Response.json(
     { code, message },
     {
       status,
-      headers: { "Cache-Control": "no-store" },
+      headers: { "Cache-Control": "no-store", ...SECURITY_HEADERS },
     },
   );
 }
@@ -233,6 +237,7 @@ export function createAssistantHandler(
       translateBailianStream(upstream.body, {
         signal: abortController.signal,
         onEvent: observeEvent,
+        onCancel: () => finalize("client_aborted", upstream.status),
       }),
       {
         status: 200,
@@ -240,6 +245,7 @@ export function createAssistantHandler(
           "Content-Type": "text/event-stream",
           "Cache-Control": "no-store",
           "X-Accel-Buffering": "no",
+          ...SECURITY_HEADERS,
         },
       },
     );

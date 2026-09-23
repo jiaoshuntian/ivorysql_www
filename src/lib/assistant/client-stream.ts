@@ -51,7 +51,12 @@ export async function readAssistantStream(
         typeof error.code === "string" &&
         typeof error.message === "string"
         ? { code: error.code, message: error.message }
-        : { code: "HTTP_ERROR", message: "The assistant request failed." },
+        : response.status === 429
+          ? {
+              code: "RATE_LIMITED",
+              message: "Too many assistant requests.",
+            }
+          : { code: "HTTP_ERROR", message: "The assistant request failed." },
     );
     return;
   }

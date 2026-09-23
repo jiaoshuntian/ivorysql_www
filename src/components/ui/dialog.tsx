@@ -36,7 +36,7 @@ function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Content
         className={cn(
-          "bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-x-2 top-2 bottom-2 z-[101] flex overflow-hidden rounded-lg border pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xl outline-none sm:inset-auto sm:right-6 sm:bottom-6 sm:h-[min(600px,calc(100dvh-3rem))] sm:w-[400px] sm:pb-0",
+          "bg-background text-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed top-[max(0.5rem,env(safe-area-inset-top))] right-[max(0.5rem,env(safe-area-inset-right))] bottom-[max(0.5rem,env(safe-area-inset-bottom))] left-[max(0.5rem,env(safe-area-inset-left))] z-[101] flex overflow-hidden rounded-lg border shadow-xl outline-none sm:top-auto sm:right-6 sm:bottom-6 sm:left-auto sm:h-[min(600px,calc(100dvh-3rem))] sm:w-[400px]",
           className,
         )}
         {...props}

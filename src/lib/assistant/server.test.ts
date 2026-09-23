@@ -179,6 +179,8 @@ describe("createAssistantHandler", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("Content-Type")).toBe("text/event-stream");
     expect(response.headers.get("Cache-Control")).toBe("no-store");
+    expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(response.headers.get("Referrer-Policy")).toBe("no-referrer");
     expect(response.headers.has("Access-Control-Allow-Origin")).toBe(false);
     await response.text();
   });
