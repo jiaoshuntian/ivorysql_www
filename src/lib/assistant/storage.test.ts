@@ -1,0 +1,92 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  getAssistantStorageKey,
+  parseStoredConversation,
+  serializeConversation,
+} from "./storage";
+
+describe("assistant conversation storage", () => {
+  it("namespaces session data by locale", () => {
+    expect(getAssistantStorageKey("en")).toBe("ivorysql-assistant:en");
+    expect(getAssistantStorageKey("zh")).toBe("ivorysql-assistant:zh");
+  });
+
+  it.each([
+    null,
+    "{broken",
+    JSON.stringify({ role: "user" }),
+    JSON.stringify([{ id: "1", role: "system", content: "bad" }]),
+    JSON.stringify([{ id: "1", role: "user", content: 7 }]),
+    JSON.stringify([{ id: "1", role: "user", content: "ok", status: "busy" }]),
+  ])("returns an empty conversation for corrupt data %#", (raw) => {
+    expect(parseStoredConversation(raw)).toEqual([]);
+  });
+
+  it("keeps only the latest 20 valid messages", () => {
+    const messages = Array.from({ length: 22 }, (_, index) => ({
+      id: String(index),
+      role: index % 2 === 0 ? "user" : "assistant",
+      content: `message-${index}`,
+    }));
+
+    const parsed = parseStoredConversation(JSON.stringify(messages));
+
+    expect(parsed).toHaveLength(20);
+    expect(parsed[0].id).toBe("2");
+    expect(parsed.at(-1)?.id).toBe("21");
+  });
+
+  it("restores old conversations while discarding unused source metadata", () => {
+    const message = {
+      id: "answer-1",
+      role: "assistant",
+      content: "answer",
+      status: "complete",
+    };
+    const raw = JSON.stringify([
+      {
+        ...message,
+        sources: [
+          {
+            id: "doc-1",
+            title: "Install",
+            url: "https://docs.ivorysql.org/en/install",
+          },
+        ],
+      },
+    ]);
+    expect(parseStoredConversation(raw)).toEqual([message]);
+  });
+
+  it("restores an in-progress assistant message as interrupted", () => {
+    expect(
+      parseStoredConversation(
+        JSON.stringify([
+          { id: "user-1", role: "user", content: "Question" },
+          { id: "answer-1", role: "assistant", content: "Partial" },
+        ]),
+      ),
+    ).toEqual([
+      { id: "user-1", role: "user", content: "Question" },
+      {
+        id: "answer-1",
+        role: "assistant",
+        content: "Partial",
+        status: "incomplete",
+      },
+    ]);
+  });
+
+  it("serializes a bounded conversation", () => {
+    const messages = Array.from({ length: 21 }, (_, index) => ({
+      id: String(index),
+      role: "user" as const,
+      content: String(index),
+    }));
+
+    expect(
+      parseStoredConversation(serializeConversation(messages)),
+    ).toHaveLength(20);
+  });
+});
